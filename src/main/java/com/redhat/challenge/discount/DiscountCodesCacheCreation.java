@@ -1,16 +1,26 @@
 package com.redhat.challenge.discount;
 
 import io.quarkus.runtime.StartupEvent;
+
+import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.commons.configuration.XMLStringConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 
 @ApplicationScoped
 public class DiscountCodesCacheCreation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("DiscountsCodeCacheCreation");
+
+    public static final String DISCOUNT_CODE_CACHE = "DISCOUNT_CODE";
+
+    @Inject
+    RemoteCacheManager remoteCacheManager;
+
 
     private static final String CACHE_CONFIG = "<distributed-cache name=\"%s\">"
           + " <encoding media-type=\"application/x-protostream\"/>"
@@ -24,5 +34,7 @@ public class DiscountCodesCacheCreation {
         // String cacheConfig = String.format(CACHE_CONFIG, "discounts");
         // Use XMLStringConfiguration. Grab a look to the simple tutorial about "creating caches on the fly" in the
         // Infinispan Simple Tutorials repository.
+        String cacheConfig = String.format(CACHE_CONFIG, DISCOUNT_CODE_CACHE);
+        remoteCacheManager.administration().getOrCreateCache(DISCOUNT_CODE_CACHE, new XMLStringConfiguration(cacheConfig));
     }
 }

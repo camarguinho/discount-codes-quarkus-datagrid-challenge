@@ -3,6 +3,10 @@ package com.redhat.challenge.discount;
 import com.redhat.challenge.discount.model.DiscountCode;
 import com.redhat.challenge.discount.model.DiscountCodeType;
 
+import io.quarkus.infinispan.client.Remote;
+import org.infinispan.client.hotrod.RemoteCache;
+
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -12,9 +16,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Path("/discounts")
@@ -22,7 +24,9 @@ import java.util.stream.Collectors;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DiscountCodesResource {
 
-    Map<String, DiscountCode> discounts = new HashMap<>();
+    @Inject
+    @Remote(DiscountCodesCacheCreation.DISCOUNT_CODE_CACHE)
+    RemoteCache<String, DiscountCode> discounts;
 
     @POST
     public Response create(DiscountCode discountCode) {
