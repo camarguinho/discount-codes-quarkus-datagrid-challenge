@@ -3,7 +3,7 @@ package com.redhat.challenge.discount;
 import com.redhat.challenge.discount.model.DiscountCode;
 import com.redhat.challenge.discount.model.DiscountCodeType;
 
-import io.quarkus.test.common.QuarkusTestResource;
+//import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
