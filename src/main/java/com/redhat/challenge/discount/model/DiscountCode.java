@@ -15,17 +15,19 @@ public class DiscountCode {
    private String enterprise;
    private DiscountCodeType type;
    private Integer used;
+   private Integer lifespanInSeconds;
 
    public DiscountCode() {
    }
 
    @ProtoFactory
-   public DiscountCode(String name, Integer amount, String enterprise, DiscountCodeType type, Integer used) {
+   public DiscountCode(String name, Integer amount, String enterprise, DiscountCodeType type, Integer used, Integer lifespanInSeconds) {
       this.name = name;
       this.amount = amount;
       this.enterprise = enterprise;
       this.type = type;
       this.used = used;
+      this.lifespanInSeconds = lifespanInSeconds;
    }
 
    @ProtoField(number = 1)
@@ -73,6 +75,15 @@ public class DiscountCode {
       this.used = used;
    }
 
+   @ProtoField(number = 6)
+   public Integer getLifespanInSeconds() {
+      return lifespanInSeconds;
+   }
+
+   public void setLifespanInSeconds(Integer lifespanInSeconds) {
+      this.lifespanInSeconds = lifespanInSeconds;
+   }
+
    @Override
    public boolean equals(Object o) {
       if (this == o)
@@ -81,17 +92,18 @@ public class DiscountCode {
          return false;
       DiscountCode that = (DiscountCode) o;
       return Objects.equals(name, that.name) && Objects.equals(amount, that.amount) && Objects
-            .equals(enterprise, that.enterprise) && type == that.type && Objects.equals(used, that.used);
+            .equals(enterprise, that.enterprise) && type == that.type && Objects.equals(used, that.used)
+            && Objects.equals(lifespanInSeconds, that.lifespanInSeconds);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hash(name, amount, enterprise, type, used);
+      return Objects.hash(name, amount, enterprise, type, used, lifespanInSeconds);
    }
 
    @Override
    public String toString() {
       return "DiscountCode{" + "name='" + name + '\'' + ", amount=" + amount + ", enterprise='" + enterprise + '\''
-            + ", type=" + type + ", used=" + used + '}';
+            + ", type=" + type + ", used=" + used + ", lifespanInSeconds="+ lifespanInSeconds + '}';
    }
 }

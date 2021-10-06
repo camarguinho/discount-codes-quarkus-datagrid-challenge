@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Path("/discounts")
@@ -32,7 +33,7 @@ public class DiscountCodesResource {
     public Response create(DiscountCode discountCode) {
         if (!discounts.containsKey(discountCode.getName())) {
             discountCode.setUsed(0);
-            discounts.put(discountCode.getName(), discountCode);
+            discounts.put(discountCode.getName(), discountCode, discountCode.getLifespanInSeconds(), TimeUnit.SECONDS);
             return Response.created(URI.create(discountCode.getName())).build();
         }
 
