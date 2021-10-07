@@ -33,7 +33,11 @@ public class DiscountCodesResource {
     public Response create(DiscountCode discountCode) {
         if (!discounts.containsKey(discountCode.getName())) {
             discountCode.setUsed(0);
-            discounts.put(discountCode.getName(), discountCode, discountCode.getLifespanInSeconds(), TimeUnit.SECONDS);
+            if (discountCode.getLifespanInSeconds() != null) {
+                discounts.put(discountCode.getName(), discountCode, discountCode.getLifespanInSeconds(), TimeUnit.SECONDS);
+            } else {
+                discounts.put(discountCode.getName(), discountCode);
+            }
             return Response.created(URI.create(discountCode.getName())).build();
         }
 
