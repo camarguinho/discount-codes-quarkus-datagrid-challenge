@@ -75,6 +75,11 @@ public class DiscountCodesResource {
     @Path("/concurrent")
     public Response createConcurrent(DiscountCode discountCode) {
 
+        // workarround for putIfAbsent issue, this is not very good because now we have two rountrips to the cache,
+        // and we cannot tell if value has been created or not in certain race condition situations 
+        // for example when 'discountCodeDoesNotExists'=true, but putIfAbsent detects a valid current value
+        Boolean discountCodeDoesNotExists = !discounts.containsKey(discountCode.getName());
+
         discountCode.setUsed(0);
         DiscountCode previousValue = null;
          if (discountCode.getLifespanInSeconds() != null) {
@@ -95,7 +100,8 @@ public class DiscountCodesResource {
         // Returns:
         //   the value being replaced, or null if nothing is being replaced.
     
-        if(Objects.isNull(previousValue)) {
+        // '&& discountCodeDoesNotExists' overwrites 'Objects.isNull(previousValue)' condition for workarround
+        if(Objects.isNull(previousValue) && discountCodeDoesNotExists) {
             return Response.created(URI.create(discountCode.getName())).build();
         } else {
             return Response.ok(URI.create(discountCode.getName())).build();
