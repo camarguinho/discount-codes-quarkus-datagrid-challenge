@@ -20,14 +20,29 @@ Which contains the definition: https://docs.jboss.org/infinispan/12.1/apidocs/or
 == Testing
 
 The CacheResurce.java implementation requires docker daemon, which is not disponible on openshift code ready plataform.
-I tried on my local machine, but the image 'infinispan/server:12.1.7.Final' is not compatible with Mac M1 (Arm). It runs, but the JVM exits with an Exception error.
+We tried on our local machine, but the image 'infinispan/server:12.1.7.Final' is not compatible with Mac M1 (Arm). It runs, but the JVM exits with an Exception error.
+As last resort, tests run on a local infinispan cache instance, using application.properties configuration.
 
 = Build Instrutions
 
+Build app and generate configuration files.
 [source, bash]
 ----
-mvn clean package
+mvn clean package 
 ----
+
+Apply configuration files to openshift.
+[source, bash]
+----
+oc apply -f ./target/kubernetes/openshift.yml
+-----
+
+Start openshift build.
+[source, bash]
+----
+oc start-build quarkus-datagrid-challenge --from-dir=target/quarkus-app
+-----
+
 
 = Challenge 6: Discount Codes Microservices challenge with Quarkus and Red Hat Data Grid
 Álvaro López Medina <alopezme@redhat.com>; Katia Aresti <karesti@redhat.com>
