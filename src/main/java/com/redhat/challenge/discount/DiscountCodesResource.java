@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -64,7 +65,70 @@ public class DiscountCodesResource {
     public DiscountCodes getByType(@PathParam("type") DiscountCodeType type) {
         List<DiscountCode> discountCodes = discounts.values().stream().filter((code) -> code.getType() == type)
               .collect(Collectors.toList());
-        return new DiscountCodes(discountCodes, discountCodes.size());
+        Integer totalUsedDicountCodes = discountCodes.stream().mapToInt(d -> d.getUsed()).sum();
+        return new DiscountCodes(discountCodes, discountCodes.size(), totalUsedDicountCodes);
     }
 
+
+    // Concurrent version
+    @POST
+    @Path("/concurrent")
+    public Response createConcurrent(DiscountCode discountCode) {
+
+        discountCode.setUsed(0);
+        DiscountCode previousValue = null;
+         if (discountCode.getLifespanInSeconds() != null) {
+            // putIfAbsent call is not returning previous value
+            previousValue = discounts.putIfAbsent(discountCode.getName(), discountCode, discountCode.getLifespanInSeconds(), TimeUnit.SECONDS );
+        } else {
+            // putIfAbsent call is not returning previous value
+            previousValue = discounts.putIfAbsent(discountCode.getName(), discountCode);
+        }
+
+        // putIfAbsent call is not returning previous value, but is functioning properly on the cache operation, javadocs states that:
+        // Returns:
+        //   the previous value associated with the specified key, or null if there was no mapping for the key.
+        //   (A null return can also indicate that the map previously associated null with the key, if the implementation supports null values.)
+        // Another Source:
+        // RemoteCache extends Basic Cache: https://docs.jboss.org/infinispan/12.1/apidocs/org/infinispan/client/hotrod/RemoteCache.html
+        // Which contains the definition: https://docs.jboss.org/infinispan/12.1/apidocs/org/infinispan/commons/api/BasicCache.html#putIfAbsent(K,V,long,java.util.concurrent.TimeUnit)
+        // Returns:
+        //   the value being replaced, or null if nothing is being replaced.
+    
+        if(Objects.isNull(previousValue)) {
+            return Response.created(URI.create(discountCode.getName())).build();
+        } else {
+            return Response.ok(URI.create(discountCode.getName())).build();
+        }
+        
+    }
+
+    // Concurrent version
+    @GET
+    @Path("/concurrent/consume/{name}")
+    public Response consumeConcurrent(@PathParam("name") String name) {
+
+        DiscountCode discountCode = null;
+        discountCode = discounts.computeIfPresent(name, (String key, DiscountCode value) -> { 
+            value.setUsed(value.getUsed() + 1); 
+            return value;
+        });
+
+        if(discountCode == null) {
+            return Response.noContent().build();
+        } else {
+            return Response.ok(discountCode).build();
+        }
+        
+    }
+
+    // Concurrent version - doesn't change because values() is lazy, evaluated at infinispan server
+    @GET
+    @Path("/concurrent/{type}")
+    public DiscountCodes getByTypeConcurrent(@PathParam("type") DiscountCodeType type) {
+        List<DiscountCode> discountCodes = discounts.values().stream().filter((code) -> code.getType() == type)
+              .collect(Collectors.toList());
+        Integer totalUsedDicountCodes = discountCodes.stream().mapToInt(d -> d.getUsed()).sum();
+        return new DiscountCodes(discountCodes, discountCodes.size(), totalUsedDicountCodes);
+    }
 }

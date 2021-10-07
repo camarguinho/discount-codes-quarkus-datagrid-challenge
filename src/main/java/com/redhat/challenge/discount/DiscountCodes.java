@@ -7,15 +7,18 @@ import java.util.List;
 
 @RegisterForReflection
 public class DiscountCodes {
+
+   private int totalUsedDiscountCodes;
    private long totalCount;
    private List<DiscountCode> discountCodesList;
 
    public DiscountCodes() {
    }
 
-   public DiscountCodes(List<DiscountCode> discountCodesList, long totalCount) {
+   public DiscountCodes(List<DiscountCode> discountCodesList, long totalCount, int totalUsedDiscountCodes) {
       this.discountCodesList = discountCodesList;
       this.totalCount = totalCount;
+      this.totalUsedDiscountCodes = totalUsedDiscountCodes;
    }
 
    public List<DiscountCode> getDiscountCodesList() {
@@ -32,5 +35,13 @@ public class DiscountCodes {
 
    public void setTotalCount(long totalCount) {
       this.totalCount = totalCount;
+   }
+
+   public long getTotalUsedDiscountCodes() {
+      return totalUsedDiscountCodes;
+   }
+
+   public void setTotalUsedDiscountCodes(int totalUsedDiscountCodes) {
+      this.totalUsedDiscountCodes = totalUsedDiscountCodes;
    }
 }
