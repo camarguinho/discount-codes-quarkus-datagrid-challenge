@@ -7,7 +7,11 @@ import com.redhat.challenge.discount.model.DiscountCodeType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,9 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 // containers The @QuarkusTestResource with the CacheResource provided, will do this for you.
 //@QuarkusTestResource(CacheResource.class)
 @QuarkusTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DiscountCodesResourceTest {
 
     @Test
+    @Order(1)
+    public void testClearCache() {
+         given()
+              .when()
+              .delete("/discounts")
+              .then()
+              .statusCode(204);
+    }
+
+    @Test
+    @Order(2)
     public void testCreateConsumeAndListCodes() {
         given()
               .body("{\"name\": \"PROMO42\", \"amount\": 20, \"enterprise\": \"ALBACETEBANK\", \"type\": \"VALUE\"}")

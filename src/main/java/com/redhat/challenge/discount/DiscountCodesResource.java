@@ -8,6 +8,7 @@ import org.infinispan.client.hotrod.RemoteCache;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -69,6 +70,11 @@ public class DiscountCodesResource {
         return new DiscountCodes(discountCodes, discountCodes.size(), totalUsedDicountCodes);
     }
 
+    @DELETE
+    public Response clearCache() {
+        discounts.clear();
+        return Response.noContent().build();
+    }
 
     // Concurrent version
     @POST
