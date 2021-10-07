@@ -1,5 +1,5 @@
 #!/bin/sh
-APP_URL=https://quarkus-datagrid-challenge-user1-challenge6.apps.cluster-pjw6b.pjw6b.sandbox1032.opentlc.com
+APP_URL=http://quarkus-datagrid-challenge-user1-challenge6.apps.cluster-pjw6b.pjw6b.sandbox1032.opentlc.com
 
 curl -i -H "Content-Type: application/json" ${APP_URL}/discounts -d '{ "name": "PROMO10", "amount": 10, "enterprise": "ZARA", "type": "VALUE"}'
 echo ---
