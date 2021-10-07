@@ -4,7 +4,6 @@ import com.redhat.challenge.discount.model.DiscountCode;
 import com.redhat.challenge.discount.model.DiscountCodeType;
 
 import io.quarkus.infinispan.client.Remote;
-import org.infinispan.client.hotrod.RemoteCache;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -26,6 +25,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class DiscountCodesResource {
+
 
     @Inject
     @Remote(DiscountCodesCacheCreation.DISCOUNT_CODE_CACHE)
@@ -121,10 +121,17 @@ public class DiscountCodesResource {
     public Response consumeConcurrent(@PathParam("name") String name) {
 
         DiscountCode discountCode = null;
-        discountCode = discounts.computeIfPresent(name, (String key, DiscountCode value) -> { 
-            value.setUsed(value.getUsed() + 1); 
+        discountCode = discounts.compute(name, (String key, DiscountCode value) -> { 
+            if(value != null)
+                value.setUsed(value.getUsed() + 1); 
             return value;
         });
+
+        // computeIfPresent is not available on RemoteCache interface
+        //discountCode = discounts.computeIfPresent(name, (String key, DiscountCode value) -> { 
+        //    value.setUsed(value.getUsed() + 1); 
+        //    return value;
+        //});
 
         if(discountCode == null) {
             return Response.noContent().build();
