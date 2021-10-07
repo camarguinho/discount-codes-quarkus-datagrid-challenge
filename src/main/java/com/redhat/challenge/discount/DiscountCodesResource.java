@@ -4,6 +4,7 @@ import com.redhat.challenge.discount.model.DiscountCode;
 import com.redhat.challenge.discount.model.DiscountCodeType;
 
 import io.quarkus.infinispan.client.Remote;
+import org.infinispan.client.hotrod.RemoteCache;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
